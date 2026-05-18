@@ -158,34 +158,10 @@
   </div>
 
   <p class="section-label" style="margin-top:2rem;">Horários disponíveis</p>
-  <div class="days-box">
-    <div class="day-row">
-      <div class="day-info">
-        <span class="day-name">Quarta-feira, 27 de maio</span>
-        <span class="day-date">07:00 · 07:40 · 08:20 · 09:00 · 09:40 · 10:20 · 11:00</span>
-      </div>
-      <span class="day-chip chip-green">7 vagas</span>
-    </div>
-    <div class="day-row">
-      <div class="day-info">
-        <span class="day-name">Quarta-feira, 3 de junho</span>
-        <span class="day-date">07:00 · 07:40 · 08:20 · 09:00 · 09:40 · 10:20 · 11:00</span>
-      </div>
-      <span class="day-chip chip-green">7 vagas</span>
-    </div>
-    <div class="day-row">
-      <div class="day-info">
-        <span class="day-name">Quarta-feira, 10 de junho</span>
-        <span class="day-date">07:00 · 07:40 · 08:20 · 09:00 · 09:40 · 10:20 · 11:00</span>
-      </div>
-      <span class="day-chip chip-green">7 vagas</span>
-    </div>
-    <div class="day-row">
-      <div class="day-info">
-        <span class="day-name">Quarta-feira, 17 de junho</span>
-        <span class="day-date">07:00 · 07:40 · 08:20 · 09:00 · 09:40 · 10:20 · 11:00</span>
-      </div>
-      <span class="day-chip chip-green">7 vagas</span>
+  <div class="days-box" id="days-box">
+    <div class="loading-row">
+      Verificando disponibilidade
+      <span class="dot-pulse"><span></span><span></span><span></span></span>
     </div>
   </div>
   <p style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:1.25rem;">Fuso GMT-03 (Brasília) · As vagas se preenchem por ordem de chegada</p>
@@ -226,6 +202,64 @@
     (47) 8916-3007
   </a>
 </footer>
+
+<script>
+// URL do Apps Script publicado (Rodrigo cola aqui após publicar)
+// Ver apps-script/README.md para instruções
+const SCRIPT_URL = "";
+
+function vagaLabel(n) {
+  if (n === 1) return '1 vaga';
+  return n + ' vagas';
+}
+
+function chipClass(n) {
+  if (n >= 3) return 'chip-green';
+  if (n >= 1) return 'chip-amber';
+  return 'chip-gray';
+}
+
+function renderDias(dias, box) {
+  if (!Array.isArray(dias) || dias.length === 0) {
+    box.innerHTML = '<div class="loading-row">Nenhum horário disponível no momento. Use o botão abaixo para ver disponibilidade direto no Google Agenda.</div>';
+    return;
+  }
+  box.innerHTML = dias.map(d => {
+    const slots = Array.isArray(d.slots) ? d.slots.join(' · ') : '';
+    return `
+      <div class="day-row">
+        <div class="day-info">
+          <span class="day-name">${d.diaSemana}, ${d.data}</span>
+          <span class="day-date">${slots}</span>
+        </div>
+        <span class="day-chip ${chipClass(d.vagas)}">${vagaLabel(d.vagas)}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function carregarDias() {
+  const box = document.getElementById('days-box');
+  if (!box) return;
+
+  if (!SCRIPT_URL) {
+    box.innerHTML = '<div class="loading-row">Use o botão abaixo para ver os horários disponíveis no Google Agenda.</div>';
+    return;
+  }
+
+  try {
+    const res = await fetch(SCRIPT_URL, { cache: 'no-store' });
+    const data = await res.json();
+    if (data && data.erro) throw new Error(data.erro);
+    renderDias(data, box);
+  } catch (e) {
+    console.error('Erro ao carregar horários:', e);
+    box.innerHTML = '<div class="loading-row">Não foi possível carregar os horários agora. Use o botão abaixo para ver disponibilidade no Google Agenda.</div>';
+  }
+}
+
+carregarDias();
+</script>
 
 </body>
 </html>
