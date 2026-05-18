@@ -26,7 +26,7 @@ A página original em `nandamota.github.io/agendamentobonus/` já está totalmen
 ## Como atualizar o link do Google Calendar
 
 1. Abrir `index.html`
-2. Localizar `href="https://calendar.app.google/bWWv7phJtFz8zpjB6"`
+2. Localizar `href="https://calendar.app.google/Qzzgzm5QWbx8rTKh9"`
 3. Trocar pela nova URL do Appointment Schedule
 4. Commit + push em `main` — deploy automático em ~1min
 
