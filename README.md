@@ -23,6 +23,31 @@ A página original em `nandamota.github.io/agendamentobonus/` já está totalmen
 - `<meta name="robots" content="noindex,nofollow">` adicionado (página privada para alunos pagantes)
 - Resto idêntico ao original
 
+## Como atualizar a lista de horários disponíveis
+
+A lista de "Horários disponíveis" no site é **estática** (hardcoded no HTML). Google bloqueia iframe do Appointment Schedule, então a opção foi listar manualmente.
+
+Quando os horários/datas mudarem no Calendar do Rodrigo:
+
+1. Abrir `index.html`
+2. Localizar bloco `<div class="days-box">` (depois de "Horários disponíveis")
+3. Atualizar cada `.day-row` com:
+   - `day-name`: dia da semana + data ("Quarta-feira, 20 de maio")
+   - `day-date`: lista de horários separados por `·`
+   - `day-chip chip-green`: número de vagas
+4. Commit + push em `main` — deploy automático em ~1min
+
+Exemplo de atualização:
+```html
+<div class="day-row">
+  <div class="day-info">
+    <span class="day-name">Quarta-feira, 20 de maio</span>
+    <span class="day-date">07:00 · 07:40 · 08:20 · 09:00 · 09:40 · 10:20 · 11:00</span>
+  </div>
+  <span class="day-chip chip-green">7 vagas</span>
+</div>
+```
+
 ## Como atualizar o link do Google Calendar
 
 1. Abrir `index.html`
