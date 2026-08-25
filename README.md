@@ -4,8 +4,8 @@ Página de agendamento da sessão de mentoria individual (30 min, Google Meet) c
 
 ## URLs
 
-- **No ar (GitHub Pages):** https://metrik-group.github.io/agendamento-pdp/
-- **Domínio final (depende de DNS):** https://agendamento.rodrigorosar.com.br — ver seção "Ativar o domínio".
+- **No ar:** https://agendamento.rodrigorosar.com.br (GitHub Pages; o endereço antigo metrik-group.github.io/agendamento-pdp/ redireciona para cá)
+- **DNS:** CNAME `agendamento` → `metrik-group.github.io` no Cloudflare (DNS only). Domínio configurado no Pages via API (deploy por Actions não lê o arquivo CNAME).
 
 ## Como funciona (arquitetura)
 
@@ -58,7 +58,7 @@ O DNS de `rodrigorosar.com.br` está no Cloudflare (mesmo padrão de `implementa
 1. Cloudflare → DNS → **Add record**: tipo `CNAME`, nome `agendamento`, destino `metrik-group.github.io`, proxy **desligado** (nuvem cinza / "DNS only"), TTL Auto.
 2. No repo, criar o arquivo `CNAME` na raiz com o conteúdo `agendamento.rodrigorosar.com.br` (sem quebra de linha extra) e fazer push.
 3. GitHub → Settings → Pages → confirmar o domínio e marcar **Enforce HTTPS** (o certificado leva ~15 min).
-4. Em `index.html`, trocar `https://metrik-group.github.io/agendamento-pdp/` por `https://agendamento.rodrigorosar.com.br/` nas tags `canonical`, `og:url` e `og:image`.
+4. Em `index.html`, trocar `https://agendamento.rodrigorosar.com.br/` por `https://agendamento.rodrigorosar.com.br/` nas tags `canonical`, `og:url` e `og:image`.
 
 ## Stack
 
