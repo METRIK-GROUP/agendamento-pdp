@@ -19,14 +19,14 @@ Aluno abre o site
 ```
 
 - Sem backend, sem build, sem framework, sem Apps Script.
-- Fonte da verdade dos horários = a agenda "Bônus 10 Primeiros" no Google Agenda da conta **rodrigo@rodrigorosar.com.br** (calendário "MENTOR | Rodrigo Rosar").
+- Fonte da verdade dos horários = a página de agendamento **"Bônus 10 Primeiros — Mentoria 1x1"** no Google Agenda do Rodrigo (criada em 25/08/2026; link curto `https://calendar.app.google/NseJ6DW8mKsRS4vV7`). A página antiga "Bônus 10 Primeiros" ficou em outra conta Google e foi abandonada.
 - O site nunca mostra datas hardcoded: o que o Rodrigo abre na agenda aparece na hora.
 
 ## Manutenção
 
 ### Abrir/fechar horários (Rodrigo, ~3 min)
 
-1. Google Agenda (conta `rodrigo@rodrigorosar.com.br`) → clicar na agenda "Bônus 10 Primeiros" (ou Configurações → **Agendamento de horários**) → editar.
+1. Google Agenda (conta do Rodrigo) → barra lateral **Páginas de agendamento de horário** → "Bônus 10 Primeiros — Mentoria 1x1" → editar.
 2. Em **Disponibilidade geral**, definir os dias/horários da nova turma (ex.: quartas 07:00–11:30) e, em **Período de agendamento**, a data de início e fim.
 3. Salvar. O site atualiza sozinho — nada a fazer no código.
 4. Para bloquear um dia específico: adicionar exceção em "Datas de disponibilidade ajustada" no mesmo painel.
