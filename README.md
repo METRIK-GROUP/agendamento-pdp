@@ -1,112 +1,72 @@
 # agendamento-pdp
 
-Página de agendamento de sessão de mentoria individual de 30 minutos com Rodrigo Rosar — bônus exclusivo da Implementação PDP 2026.
+Página de agendamento da sessão de mentoria individual (30 min, Google Meet) com Rodrigo Rosar — bônus da Implementação Projeto de Primeira.
 
 ## URLs
 
-- **URL provisória (até DNS):** https://metrik-group.github.io/agendamento-pdp/
-- **URL final:** https://agendamento.rodrigorosar.com.br (após DNS Cloudflare)
+- **No ar (GitHub Pages):** https://metrik-group.github.io/agendamento-pdp/
+- **Domínio final (depende de DNS):** https://agendamento.rodrigorosar.com.br — ver seção "Ativar o domínio".
+
+## Como funciona (arquitetura)
+
+Uma única página HTML estática. Toda a lógica de agendamento é do **Google Agenda (Appointment Schedule)**, embutido na página via `<iframe>`:
+
+```
+Aluno abre o site
+  → vê o calendário do Google embutido (horários livres em tempo real)
+  → escolhe dia/horário, preenche nome e e-mail
+  → Google cria o evento na agenda do Rodrigo, gera o link do Meet e envia a confirmação por e-mail
+```
+
+- Sem backend, sem build, sem framework, sem Apps Script.
+- Fonte da verdade dos horários = a agenda "Bônus 10 Primeiros" no Google Agenda da conta **rodrigo@rodrigorosar.com.br** (calendário "MENTOR | Rodrigo Rosar").
+- O site nunca mostra datas hardcoded: o que o Rodrigo abre na agenda aparece na hora.
+
+## Manutenção
+
+### Abrir/fechar horários (Rodrigo, ~3 min)
+
+1. Google Agenda (conta `rodrigo@rodrigorosar.com.br`) → clicar na agenda "Bônus 10 Primeiros" (ou Configurações → **Agendamento de horários**) → editar.
+2. Em **Disponibilidade geral**, definir os dias/horários da nova turma (ex.: quartas 07:00–11:30) e, em **Período de agendamento**, a data de início e fim.
+3. Salvar. O site atualiza sozinho — nada a fazer no código.
+4. Para bloquear um dia específico: adicionar exceção em "Datas de disponibilidade ajustada" no mesmo painel.
+
+Se aparecer "Sem disponibilidade durante esses dias" / "Nenhum horário disponível no próximo ano" na página, é porque o período da agenda expirou ou não há janela aberta — repetir o passo 2.
+
+### Trocar a agenda (link)
+
+Se o Rodrigo criar um novo Appointment Schedule:
+
+1. No Google Agenda, abrir a agenda → **Compartilhar** → copiar o **link** (formato `https://calendar.app.google/XXXX`). Abrir esse link no navegador e copiar também a URL longa da página de reserva (`https://calendar.google.com/calendar/appointments/schedules/AcZ...`).
+2. Em `index.html`, trocar:
+   - o `src` do `<iframe>` → URL longa + `?gv=true` no final
+   - o `href` de "Abrir a agenda em nova aba" → link curto
+3. Commit + push em `main` → deploy automático em ~1 min.
+
+### Trocar a foto
+
+Substituir `assets/rodrigo-160.jpg` e `assets/rodrigo-160.webp` (160×160, quadrado, rosto centralizado no topo). Commit + push.
+
+### Imagem de preview (WhatsApp/redes)
+
+`assets/og.jpg` (1200×630). Referenciada no `<meta property="og:image">`.
+
+## Ativar o domínio `agendamento.rodrigorosar.com.br`
+
+O DNS de `rodrigorosar.com.br` está no Cloudflare (mesmo padrão de `implementacao.` e `links.`).
+
+1. Cloudflare → DNS → **Add record**: tipo `CNAME`, nome `agendamento`, destino `metrik-group.github.io`, proxy **desligado** (nuvem cinza / "DNS only"), TTL Auto.
+2. No repo, criar o arquivo `CNAME` na raiz com o conteúdo `agendamento.rodrigorosar.com.br` (sem quebra de linha extra) e fazer push.
+3. GitHub → Settings → Pages → confirmar o domínio e marcar **Enforce HTTPS** (o certificado leva ~15 min).
+4. Em `index.html`, trocar `https://metrik-group.github.io/agendamento-pdp/` por `https://agendamento.rodrigorosar.com.br/` nas tags `canonical`, `og:url` e `og:image`.
 
 ## Stack
 
-- HTML estático puro (clonado byte-a-byte de https://nandamota.github.io/agendamentobonus/)
-- Sem build, sem framework
-- DM Sans + DM Serif Display via Google Fonts
-- JS vanilla que carrega "Dias disponíveis" via Apps Script (reutiliza o da Nanda — já lê o Calendar do Rodrigo)
-- GitHub Pages (workflow `.github/workflows/deploy.yml`)
+- HTML + CSS puros; fontes DM Sans + DM Serif Display (Google Fonts).
+- `noindex,nofollow` + `robots.txt` bloqueando tudo: página privada para alunos.
+- GitHub Pages via `.github/workflows/deploy.yml` (push em `main` publica).
 
-## Origem da página
+## Histórico
 
-A página original em `nandamota.github.io/agendamentobonus/` já está totalmente nomeada para Rodrigo Rosar — Nanda só hospedava o GitHub Pages dela. Este repo é um espelho com:
-
-- Foto base64 inline → arquivo local `assets/rodrigo.jpg`
-- `<meta name="robots" content="noindex,nofollow">` adicionado (página privada para alunos pagantes)
-- Resto idêntico ao original
-
-## Como atualizar a lista de horários disponíveis
-
-A lista de "Horários disponíveis" no site é **estática** (hardcoded no HTML). Google bloqueia iframe do Appointment Schedule, então a opção foi listar manualmente.
-
-Quando os horários/datas mudarem no Calendar do Rodrigo:
-
-1. Abrir `index.html`
-2. Localizar bloco `<div class="days-box">` (depois de "Horários disponíveis")
-3. Atualizar cada `.day-row` com:
-   - `day-name`: dia da semana + data ("Quarta-feira, 20 de maio")
-   - `day-date`: lista de horários separados por `·`
-   - `day-chip chip-green`: número de vagas
-4. Commit + push em `main` — deploy automático em ~1min
-
-Exemplo de atualização:
-```html
-<div class="day-row">
-  <div class="day-info">
-    <span class="day-name">Quarta-feira, 20 de maio</span>
-    <span class="day-date">07:00 · 07:40 · 08:20 · 09:00 · 09:40 · 10:20 · 11:00</span>
-  </div>
-  <span class="day-chip chip-green">7 vagas</span>
-</div>
-```
-
-## Como atualizar o link do Google Calendar
-
-1. Abrir `index.html`
-2. Localizar `href="https://calendar.app.google/Qzzgzm5QWbx8rTKh9"`
-3. Trocar pela nova URL do Appointment Schedule
-4. Commit + push em `main` — deploy automático em ~1min
-
-## Como atualizar a foto
-
-Substituir `assets/rodrigo.jpg` (manter nome e extensão). Commit + push.
-
-## Como ativar o domínio custom
-
-1. **Cloudflare** → DNS de `rodrigorosar.com.br` → adicionar registro:
-   - Type: `CNAME`
-   - Name: `agendamento`
-   - Target: `metrik-group.github.io`
-   - Proxy status: **DNS only** (nuvem cinza, NÃO laranja)
-   - TTL: Auto
-
-2. Aguardar propagação (~5-30min). Validar com:
-   ```powershell
-   Resolve-DnsName agendamento.rodrigorosar.com.br -Server 8.8.8.8
-   ```
-
-3. Restaurar o `CNAME` no repo:
-   ```powershell
-   [System.IO.File]::WriteAllText("C:\dev\agendamento-pdp\CNAME", "agendamento.rodrigorosar.com.br", [System.Text.Encoding]::ASCII)
-   cd C:\dev\agendamento-pdp
-   git add CNAME
-   git commit -m "ci: restaura CNAME após DNS Cloudflare ativo"
-   git push
-   ```
-
-4. Após Pages provisionar Let's Encrypt (~15min), habilitar HTTPS enforce:
-   ```powershell
-   gh api --method PUT repos/METRIK-GROUP/agendamento-pdp/pages -F https_enforced=true
-   ```
-
-## Apps Script (dias disponíveis)
-
-A URL do Apps Script está hardcoded no JS:
-```
-https://script.google.com/macros/s/AKfycbzzYwGFuOZreKPbylw7iw4y0fgtJ9YVuX40euN1tkDeBHhPwgpe1AS2NG8w2JywkGhv/exec
-```
-
-Esse script é o da Nanda Mota mas lê o calendar do Rodrigo. Se algum dia ela desativar, criar Apps Script novo na conta do Rodrigo e trocar a URL.
-
-## Estrutura
-
-```
-agendamento-pdp/
-├── index.html              # página única
-├── assets/
-│   └── rodrigo.jpg         # foto perfil 64×64 (real 840×1000)
-├── reference/
-│   ├── nanda-original.html # snapshot pra referência
-│   └── NOTES.md            # notas detalhadas da página original
-├── .github/workflows/
-│   └── deploy.yml          # deploy Pages
-└── README.md
-```
+- `apps-script/` — versão antiga com Apps Script (lista de slots + reserva própria). Abandonada em 25/08/2026: o widget oficial do Google resolve tudo sem depender de deploy na conta do Rodrigo. Mantido só como referência.
+- `reference/` — snapshot da página original hospedada pela Nanda (`nandamota.github.io/agendamentobonus`) e notas de paleta/copy.
