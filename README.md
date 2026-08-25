@@ -1,6 +1,6 @@
 # agendamento-pdp
 
-Página de agendamento da sessão de mentoria individual (30 min, Google Meet) com Rodrigo Rosar — bônus da Implementação Projeto de Primeira.
+Página de agendamento da sessão de mentoria individual (25 min, Google Meet) com Rodrigo Rosar — bônus da Implementação Projeto de Primeira.
 
 ## URLs
 
@@ -51,18 +51,15 @@ Substituir `assets/rodrigo-160.jpg` e `assets/rodrigo-160.webp` (160×160, quadr
 
 `assets/og.jpg` (1200×630). Referenciada no `<meta property="og:image">`.
 
-## Ativar o domínio `agendamento.rodrigorosar.com.br`
+## Domínio (feito em 25/08/2026)
 
-O DNS de `rodrigorosar.com.br` está no Cloudflare (mesmo padrão de `implementacao.` e `links.`).
-
-1. Cloudflare → DNS → **Add record**: tipo `CNAME`, nome `agendamento`, destino `metrik-group.github.io`, proxy **desligado** (nuvem cinza / "DNS only"), TTL Auto.
-2. No repo, criar o arquivo `CNAME` na raiz com o conteúdo `agendamento.rodrigorosar.com.br` (sem quebra de linha extra) e fazer push.
-3. GitHub → Settings → Pages → confirmar o domínio e marcar **Enforce HTTPS** (o certificado leva ~15 min).
-4. Em `index.html`, trocar `https://agendamento.rodrigorosar.com.br/` por `https://agendamento.rodrigorosar.com.br/` nas tags `canonical`, `og:url` e `og:image`.
+- Cloudflare: CNAME `agendamento` → `metrik-group.github.io`, proxy desligado (DNS only).
+- GitHub Pages: como o deploy é por Actions, o arquivo `CNAME` do repo **não** é lido. O domínio foi definido via API: `gh api --method PUT repos/METRIK-GROUP/agendamento-pdp/pages -f cname=agendamento.rodrigorosar.com.br` (conta com admin no repo) e depois `-F https_enforced=true` quando o certificado ficou `approved`.
+- `canonical`, `og:url` e `og:image` no `index.html` apontam para o domínio final.
 
 ## Stack
 
-- HTML + CSS puros; fontes DM Sans + DM Serif Display (Google Fonts).
+- HTML + CSS puros; fontes Maven Pro (títulos, labels, botões), Inter (corpo) e DM Serif Display (frase editorial), via Google Fonts. Visual no padrão do site da Implementação (hero escuro, paleta METRIK monocromática, sem sombras).
 - `noindex,nofollow` + `robots.txt` bloqueando tudo: página privada para alunos.
 - GitHub Pages via `.github/workflows/deploy.yml` (push em `main` publica).
 
